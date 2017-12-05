@@ -6,7 +6,7 @@
 ;; URL: https://github.com/fuxialexander/counsel-notmuch
 ;; Keywords: mail
 ;; Version: 1.0
-;; Package-Requires: ((swiper "0.10.0") (notmuch "0.21"))
+;; Package-Requires: ((emacs "24") (ivy "0.10.0") (notmuch "0.21"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -37,44 +37,45 @@
 ;;; Code:
 ;;
 
-(require 'ivy)
+(require 'counsel)
+(require 'notmuch)
+(require 's)
 
-(defcustom counsel-notmuch-path "/usr/local/bin/notmuch" "path to notmuch executable"
-  :group 'notmuch
+(defcustom counsel-notmuch-path "/usr/local/bin/notmuch"
+  "Path to notmuch executable."
+  :type 'string
   :group 'counsel-notmuch)
 
 (defvar counsel-notmuch-history nil
   "History for `counsel-notmuch'.")
 
 (defun counsel-notmuch-cmd (input)
-  "Return mail"
+  "Form notmuch query command using INPUT."
   (counsel-require-program counsel-notmuch-path)
   (format "notmuch search %s" input)
   )
 
 (defun counsel-notmuch-function (input)
-  "helper function"
-  (setq counsel-notmuch-base-command (concat counsel-notmuch-path " search"))
+  "Get mail from notmuch using INPUT."
   (if (< (length input) 3)
       (counsel-more-chars 3)
     (counsel--async-command
      (counsel-notmuch-cmd input)) '("" "working...")))
 
-(defun counsel-notmuch-action-tree (thread)
-  "open search result in tree view"
-  (setq thread-id (car (split-string thread "\\ +")))
-  (notmuch-tree thread-id initial-input nil)
-  )
+(defun counsel-notmuch-action-tree (thread &optional initial-input)
+  "Open resulting THREAD in notmuch-tree view with INITIAL-INPUT."
+  (let ((thread-id (car (split-string thread "\\ +"))))
+    (notmuch-tree thread-id initial-input nil)))
 
 
 (defun counsel-notmuch-action-show (thread)
-  "open search result in show view"
+  "Open resulting THREAD in notmuch-show view."
   (let ((title (concat "*counsel-notmuch-show*" (substring thread 24)))
         (thread-id (car (split-string thread "\\ +"))))
-    (notmuch-show-reuse-buffer thread-id nil nil nil title)))
+    (notmuch-show thread-id nil nil nil title)))
 
 (defun counsel-notmuch-transformer (str)
-  "search notmuch asynchronously through ivy"
+  "Transform STR to notmuch display style."
   (when (string-match "thread:" str)
     (let* ((mid (substring str 24))
            (date (propertize (substring str 24 37) 'face 'notmuch-search-date))
@@ -97,9 +98,8 @@
 
 ;;;###autoload
 (defun counsel-notmuch (&optional initial-input)
-  "search for your email in notmuch"
+  "Search for your email in notmuch with INITIAL-INPUT."
   (interactive)
-  (ivy-set-prompt 'counsel-notmuch counsel-prompt-function)
   (ivy-read "Notmuch Search"
             #'counsel-notmuch-function
             :initial-input initial-input
