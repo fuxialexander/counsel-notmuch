@@ -1,0 +1,4 @@
+* ~counsel-notmuch~
+  This package provides ~counsel-notmuch~ function which is inspired by [[https://github.com/xuchunyang/helm-notmuch][helm-notmuch]] Simply call ~counsel-notmuch~ function and input your notmuch query.
+
+
