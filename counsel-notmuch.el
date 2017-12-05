@@ -6,7 +6,7 @@
 ;; URL: https://github.com/fuxialexander/counsel-notmuch
 ;; Keywords: mail
 ;; Version: 1.0
-;; Package-Requires: ((emacs "24") (ivy "0.10.0") (notmuch "0.21"))
+;; Package-Requires: ((emacs "24") (ivy "0.10.0") (notmuch "0.21") (s "1.12.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
