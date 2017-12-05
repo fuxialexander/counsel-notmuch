@@ -63,13 +63,13 @@
      (counsel-notmuch-cmd input)) '("" "working...")))
 
 (defun counsel-notmuch-action-tree (thread &optional initial-input)
-  "Open resulting THREAD in notmuch-tree view with INITIAL-INPUT."
+  "Open resulting THREAD in ‘notmuch-tree’ view with INITIAL-INPUT."
   (let ((thread-id (car (split-string thread "\\ +"))))
     (notmuch-tree thread-id initial-input nil)))
 
 
 (defun counsel-notmuch-action-show (thread)
-  "Open resulting THREAD in notmuch-show view."
+  "Open resulting THREAD in ‘notmuch-show’ view."
   (let ((title (concat "*counsel-notmuch-show*" (substring thread 24)))
         (thread-id (car (split-string thread "\\ +"))))
     (notmuch-show thread-id nil nil nil title)))
