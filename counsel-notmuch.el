@@ -41,10 +41,35 @@
 (require 'notmuch)
 (require 's)
 
-(defcustom counsel-notmuch-path "/usr/local/bin/notmuch"
+(defgroup counsel-notmuch nil
+  "Options for counsel-notmuch."
+  :group 'Notmuch)
+
+(defcustom counsel-notmuch-path "notmuch"
   "Path to notmuch executable."
   :type 'string
   :group 'counsel-notmuch)
+
+(defface counsel-notmuch-date-face
+  '((t :inherit notmuch-search-date :background nil))
+  "Default face used in tree mode face for matching messages"
+  :group 'counsel-notmuch)
+
+(defface counsel-notmuch-count-face
+  '((t :inherit notmuch-search-count :background nil))
+  "Default face used in tree mode face for matching messages"
+  :group 'counsel-notmuch)
+
+(defface counsel-notmuch-people-face
+  '((t :inherit notmuch-search-matching-authors :background nil))
+  "Default face used in tree mode face for matching messages"
+  :group 'counsel-notmuch)
+
+(defface counsel-notmuch-subject-face
+  '((t :inherit notmuch-search-subject :background nil))
+  "Default face used in tree mode face for matching messages"
+  :group 'counsel-notmuch)
+
 
 (defvar counsel-notmuch-history nil
   "History for `counsel-notmuch'.")
@@ -52,7 +77,8 @@
 (defun counsel-notmuch-cmd (input)
   "Form notmuch query command using INPUT."
   (counsel-require-program counsel-notmuch-path)
-  (format "notmuch search %s" input)
+  (format "notmuch search %s"
+          (shell-quote-argument input))
   )
 
 (defun counsel-notmuch-function (input)
@@ -78,21 +104,21 @@
   "Transform STR to notmuch display style."
   (when (string-match "thread:" str)
     (let* ((mid (substring str 24))
-           (date (propertize (substring str 24 37) 'face 'notmuch-search-date))
+           (date (propertize (substring str 24 37) 'face 'counsel-notmuch-date-face))
            (mat (propertize
                  (substring mid (string-match "[[]" mid) (+ (string-match "[]]" mid) 1))
                  'face
-                 'notmuch-search-count))
+                 'counsel-notmuch-count-face))
            (people
             (propertize
              (truncate-string-to-width (s-trim (nth 1 (split-string mid "[];]"))) 20)
              'face
-             'notmuch-search-matching-authors))
+             'counsel-notmuch-people-face))
            (subject
             (propertize
              (truncate-string-to-width (s-trim (nth 1 (split-string mid "[;]"))) (- (window-width) 32))
              'face
-             'notmuch-search-subject))
+             'counsel-notmuch-subject-face))
            (str (format "%s\t%10s\t%20s\t%s" date mat people subject)))
       str)))
 
@@ -100,7 +126,7 @@
 (defun counsel-notmuch (&optional initial-input)
   "Search for your email in notmuch with INITIAL-INPUT."
   (interactive)
-  (ivy-read "Notmuch Search"
+  (ivy-read "Notmuch Search: "
             #'counsel-notmuch-function
             :initial-input initial-input
             :dynamic-collection t
@@ -108,11 +134,8 @@
             :history 'counsel-notmuch-history
             :action '(1
                       ("o" counsel-notmuch-action-show "Show")
-                      ("t" counsel-notmuch-action-tree "Tree View")
-                      )
-            :unwind (lambda ()
-                      (counsel-delete-process)
-                      (swiper--cleanup))
+                      ("t" counsel-notmuch-action-tree "Tree View"))
+            :unwind (lambda () (counsel-delete-process))
             :caller 'counsel-notmuch))
 
 (ivy-set-display-transformer 'counsel-notmuch 'counsel-notmuch-transformer)
