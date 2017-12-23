@@ -116,7 +116,7 @@
              'counsel-notmuch-people-face))
            (subject
             (propertize
-             (truncate-string-to-width (s-trim (nth 1 (split-string mid "[;]"))) (- (window-width) 32))
+             (truncate-string-to-width (s-trim (nth 1 (split-string mid "[;]"))) (- (frame-width) 32))
              'face
              'counsel-notmuch-subject-face))
            (str (format "%s\t%10s\t%20s\t%s" date mat people subject)))
