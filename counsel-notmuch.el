@@ -84,7 +84,7 @@
 (defun counsel-notmuch-function (input)
   "Get mail from notmuch using INPUT."
   (if (< (length input) 3)
-      (counsel-more-chars)
+      (ivy-more-chars)
     (counsel--async-command
      (counsel-notmuch-cmd input)) '("" "working...")))
 
