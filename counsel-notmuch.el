@@ -50,6 +50,11 @@
   :type 'string
   :group 'counsel-notmuch)
 
+(defcustom counsel-notmuch-default-search "tag:inbox"
+  "Default initial search string"
+  :type 'string
+  :group 'counsel-notmuch)
+
 (defface counsel-notmuch-date-face
   '((t :inherit notmuch-search-date :background nil))
   "Default face used in tree mode face for matching messages"
@@ -126,6 +131,8 @@
 (defun counsel-notmuch (&optional initial-input)
   "Search for your email in notmuch with INITIAL-INPUT."
   (interactive)
+  (if (equal initial-input nil)
+      (setq initial-input counsel-notmuch-default-search))
   (ivy-read "Notmuch Search: "
             #'counsel-notmuch-function
             :initial-input initial-input
